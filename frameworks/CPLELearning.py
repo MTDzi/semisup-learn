@@ -74,7 +74,7 @@ class CPLELearningModel(BaseEstimator):
 
     """
 
-    def __init__(self, basemodel, pessimistic=True, predict_from_probabilities = False, use_sample_weighting = True, max_iter=3000, verbose = 1):
+    def __init__(self, basemodel, pessimistic=True, predict_from_probabilities=False, use_sample_weighting=True, max_iter=3000, verbose=1):
         self.model = basemodel
         self.pessimistic = pessimistic
         self.predict_from_probabilities = predict_from_probabilities
@@ -284,6 +284,7 @@ class CPLELearningModel(BaseEstimator):
 
         if self.predict_from_probabilities:
             P = self.predict_proba(X)
+            # TODO: Figure out if mean isn't better
             return (P[:, 0]<numpy.average(P[:, 0]))
         else:
             return self.model.predict(X)
