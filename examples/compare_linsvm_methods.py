@@ -2,6 +2,8 @@ import sklearn.svm
 import numpy as np
 import random
 
+import sys
+sys.path.append('../')
 from frameworks.CPLELearning import CPLELearningModel
 from methods import scikitTSVM
 from examples.plotutils import evaluate_and_plot
@@ -31,8 +33,8 @@ ys[sidx] = ytrue[sidx]
 
 Xsupervised = Xs[ys!=-1, :]
 ysupervised = ys[ys!=-1]
-    
-# compare models     
+
+# compare models
 lbl = "Purely supervised SVM:"
 print lbl
 model = sklearn.svm.SVC(kernel=kernel, probability=True)
@@ -46,6 +48,7 @@ model.fit(Xs, ys.astype(int))
 evaluate_and_plot(model, Xs, ys, ytrue, lbl, 2)
 
 lbl = "CPLE(pessimistic) SVM:"
+import pdb; pdb.set_trace()
 print lbl
 model = CPLELearningModel(sklearn.svm.SVC(kernel=kernel, probability=True), predict_from_probabilities=True)
 model.fit(Xs, ys.astype(int))
