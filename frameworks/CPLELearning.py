@@ -74,7 +74,7 @@ class CPLELearningModel(BaseEstimator):
 
     """
 
-    def __init__(self, basemodel, pessimistic=True, predict_from_probabilities=False, use_sample_weighting=True, max_iter=3000, verbose=1):
+    def __init__(self, basemodel, pessimistic=True, predict_from_probabilities=False, use_sample_weighting=True, max_iter=3000, threshold_fun=numpy.average, verbose=1):
         self.model = basemodel
         self.pessimistic = pessimistic
         self.predict_from_probabilities = predict_from_probabilities
@@ -96,6 +96,8 @@ class CPLELearningModel(BaseEstimator):
 
         # unique id
         self.id = str(unichr(numpy.random.randint(26)+97))+str(unichr(numpy.random.randint(26)+97))
+
+        self.threshold_fun = threshold_fun
 
     def discriminative_likelihood(self, model, labeledData, labeledy = None, unlabeledData = None, unlabeledWeights = None, unlabeledlambda = 1, gradient=[], alpha = 0.01):
         unlabeledy = (unlabeledWeights[:, 0]<0.5)*1
@@ -194,15 +196,6 @@ class CPLELearningModel(BaseEstimator):
         # pessimistic soft labels ('weights') q for unlabelled points, q=P(k=0|Xu)
         f = lambda softlabels, grad=[]: self.discriminative_likelihood_objective(
             self.model, labeledX, labeledy=labeledy, unlabeledData=unlabeledX, unlabeledWeights=numpy.vstack((softlabels, 1-softlabels)).T, gradient=grad) #- supLL
-        def f(softlabels, grad=[]):
-            # softlabels = numpy.array(softlabels)
-            return self.discriminative_likelihood_objective(
-                self.model, labeledX,
-                labeledy=labeledy,
-                unlabeledData=unlabeledX,
-                unlabeledWeights=numpy.vstack((softlabels, 1-softlabels)).T,
-                gradient=grad
-            ) #- supLL
 
         lblinit = numpy.random.random(len(unlabeledy))
 
@@ -284,8 +277,7 @@ class CPLELearningModel(BaseEstimator):
 
         if self.predict_from_probabilities:
             P = self.predict_proba(X)
-            # TODO: Figure out if mean isn't better
-            return (P[:, 0]<numpy.average(P[:, 0]))
+            return (P[:, 0]<self.threshold_fun(P[:, 0]))
         else:
             return self.model.predict(X)
 

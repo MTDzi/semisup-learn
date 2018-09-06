@@ -1,4 +1,4 @@
-from sklearn.metrics import average_precision_score, precision_recall_curve
+from sklearn.metrics import average_precision_score, precision_recall_curve, roc_auc_score, roc_curve
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 
@@ -20,6 +20,20 @@ mpl.rcParams['axes.labelsize'] = 18
 mpl.rcParams['axes.titlesize'] = 20
 
 
+def plot_roc_curve(y_test, y_pred, title):
+  roc = roc_curve(y_test, y_pred)
+
+  plt.plot(roc[0], roc[1],
+           label='{} (AUC = {:.2f})'.format(title, roc_auc_score(y_test, y_pred.flatten())),
+           lw=3)
+  plt.fill_between(roc[0], 0, roc[1], alpha=0.3)
+  plt.xlabel('FPR')
+  plt.ylabel('TPR')
+  plt.xlim([0, 1])
+  plt.ylim([0, 1])
+  plt.legend(loc=3);
+
+
 def plot_prec_rec_curve(y_test, y_pred, title):
   prec_recall_curve = precision_recall_curve(y_test, y_pred)
 
@@ -31,4 +45,8 @@ def plot_prec_rec_curve(y_test, y_pred, title):
   plt.ylabel('Precision')
   plt.xlim([0, 1])
   plt.ylim([0, 1])
-  plt.legend(loc=1);
+  plt.legend(loc=3)
+
+
+
+
